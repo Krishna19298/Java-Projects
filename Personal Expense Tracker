@@ -1,0 +1,130 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Transaction {
+    private String type;        
+    private String category;    
+    private double amount;
+    private String description;
+
+    public Transaction(String type, String category, double amount, String description) {
+        this.type = type;
+        this.category = category;
+        this.amount = amount;
+        this.description = description;
+    }
+
+    public String getType() { return type; }
+    public double getAmount() { return amount; }
+
+    @Override
+    public String toString() {
+        String symbol = type.equals("INCOME") ? "+" : "-";
+        return String.format("[%-7s] %s$%-7.2f | Category: %-12s | Desc: %s", 
+                             type, symbol, amount, category, description);
+    }
+}
+
+public class ExpenseTrackerApp {
+    private static ArrayList<Transaction> transactions = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== PERSONAL EXPENSE TRACKER ===");
+            System.out.println("1. Add Income");
+            System.out.println("2. Add Expense");
+            System.out.println("3. View All Transactions");
+            System.out.println("4. View Financial Summary");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option (1-5): ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    addTransaction("INCOME");
+                    break;
+                case 2:
+                    addTransaction("EXPENSE");
+                    break;
+                case 3:
+                    viewTransactions();
+                    break;
+                case 4:
+                    viewSummary();
+                    break;
+                case 5:
+                    running = false;
+                    System.out.println("Closing tracker. Have a financially responsible day!");
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+        scanner.close();
+    }
+
+    private static void addTransaction(String type) {
+        System.out.print("Enter Category (e.g., " + (type.equals("INCOME") ? "Salary, Gift" : "Food, Rent, Gas") + "): ");
+        String category = scanner.nextLine();
+
+        System.out.print("Enter Description: ");
+        String description = scanner.nextLine();
+
+        System.out.print("Enter Amount: $");
+        double amount = scanner.nextDouble();
+
+        Transaction newTrans = new Transaction(type, category, amount, description);
+        transactions.add(newTrans);
+
+        System.out.println("✅ " + type + " added successfully!");
+    }
+
+    private static void viewTransactions() {
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions found. Add some first!");
+            return;
+        }
+
+        System.out.println("\n--- Transaction History ---");
+        for (Transaction t : transactions) {
+            System.out.println(t.toString());
+        }
+        System.out.println("---------------------------");
+    }
+
+    private static void viewSummary() {
+        if (transactions.isEmpty()) {
+            System.out.println("No data to summarize.");
+            return;
+        }
+
+        double totalIncome = 0;
+        double totalExpense = 0;
+
+        for (Transaction t : transactions) {
+            if (t.getType().equals("INCOME")) {
+                totalIncome += t.getAmount();
+            } else if (t.getType().equals("EXPENSE")) {
+                totalExpense += t.getAmount();
+            }
+        }
+
+        double netBalance = totalIncome - totalExpense;
+
+        System.out.println("\n=== FINANCIAL SUMMARY ===");
+        System.out.printf("Total Income:  +$%.2f\n", totalIncome);
+        System.out.printf("Total Expense: -$%.2f\n", totalExpense);
+        System.out.println("-------------------------");
+        
+        if (netBalance < 0) {
+            System.out.printf("Net Balance:   -$%.2f (Warning: You are in the negative!)\n", Math.abs(netBalance));
+        } else {
+            System.out.printf("Net Balance:   +$%.2f\n", netBalance);
+        }
+    }
+}
