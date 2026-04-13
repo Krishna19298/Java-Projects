@@ -1,0 +1,104 @@
+import java.util.Scanner;
+
+public class MovieTheaterApp {
+    // A 2D array representing 5 rows and 5 columns (25 seats total)
+    private static char[][] seats = new char[5][5];
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        // Set all seats to 'O' (Open) before we start
+        initializeSeats();
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== STARCITY CINEMAS ===");
+            System.out.println("1. View Seating Chart");
+            System.out.println("2. Book a Seat");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    displaySeats();
+                    break;
+                case 2:
+                    bookSeat();
+                    break;
+                case 3:
+                    running = false;
+                    System.out.println("Enjoy the movie!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        scanner.close();
+    }
+
+    // Fills the 2D array with 'O' characters
+    private static void initializeSeats() {
+        for (int i = 0; i < seats.length; i++) {
+            for (int j = 0; j < seats[i].length; j++) {
+                seats[i][j] = 'O'; 
+            }
+        }
+    }
+
+    // Prints the grid to the console
+    private static void displaySeats() {
+        System.out.println("\n      [ SCREEN ]");
+        System.out.println("  ------------------");
+        
+        // Print column numbers at the top
+        System.out.print("   ");
+        for (int i = 1; i <= seats[0].length; i++) {
+            System.out.print(i + "  ");
+        }
+        System.out.println();
+
+        // Print rows with Row Letters (A, B, C...)
+        for (int i = 0; i < seats.length; i++) {
+            // Trick: Adding an integer to 'A' gets the next letter in the alphabet
+            System.out.print((char) ('A' + i) + "  "); 
+            
+            for (int j = 0; j < seats[i].length; j++) {
+                System.out.print(seats[i][j] + "  ");
+            }
+            System.out.println();
+        }
+        System.out.println("\nLegend: O = Open | X = Taken");
+    }
+
+    // Handles the booking logic
+    private static void bookSeat() {
+        System.out.print("\nEnter Row Letter (A-E): ");
+        // Get the letter, make it uppercase, and grab the first character
+        char rowChar = scanner.next().toUpperCase().charAt(0);
+        
+        System.out.print("Enter Column Number (1-5): ");
+        int col = scanner.nextInt();
+
+        // Convert the user's input into 0-based array indexes
+        // E.g., 'A' - 'A' = 0. 'B' - 'A' = 1.
+        int rowIndex = rowChar - 'A'; 
+        // E.g., User types column 1, which is index 0 in the array
+        int colIndex = col - 1; 
+
+        // 1. Safety Check: Did they type a valid seat?
+        if (rowIndex < 0 || rowIndex >= seats.length || colIndex < 0 || colIndex >= seats[0].length) {
+            System.out.println("❌ Invalid seat selection. Please choose between A-E and 1-5.");
+            return;
+        }
+
+        // 2. Availability Check: Is it already taken?
+        if (seats[rowIndex][colIndex] == 'X') {
+            System.out.println("❌ Sorry, that seat is already booked!");
+        } else {
+            // 3. Book it!
+            seats[rowIndex][colIndex] = 'X'; 
+            System.out.println("✅ Seat " + rowChar + col + " successfully booked!");
+        }
+    }
+}
